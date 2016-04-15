@@ -101,5 +101,6 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
                 }
             }
         }
+        return start;
     }
 }
