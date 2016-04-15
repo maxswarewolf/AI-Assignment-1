@@ -6,6 +6,10 @@
 package ai_assignment1V2;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  *
@@ -16,6 +20,8 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
     private final EnumHeursitic hue;
     private int limit = 0;
     private final boolean HAS_DEPTH = false;
+    private final Queue<Node<PuzzleState>> open = new LinkedList<>();
+    private final Map<Integer, Node<PuzzleState>> closed = new HashMap<>();
 
     BFS(EnumHeursitic hue) {
         this.hue = hue;
@@ -63,7 +69,7 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public int getNodeCost(Node node) {
+    public int getNodeCost(Node<PuzzleState> node) {
         return 0;
     }
 
@@ -90,5 +96,30 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
     @Override
     public boolean limitReached(Node<PuzzleState> a) {
         return (this.HAS_DEPTH && (a.getFINAL_COST() > getLimit()));
+    }
+
+    @Override
+    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
+        open.add(start);
+        while (!open.isEmpty()) {
+            Node<PuzzleState> origin = open.poll();
+            if (closed.containsKey(origin.hashCode())) {
+                continue;
+            }
+            closed.put(origin.hashCode(), origin);
+
+            if (origin.isGoal(end.getData())) {
+                return origin;
+            }
+
+            Node<PuzzleState> neighbours[] = origin.genNeighbours();
+
+            for (byte i = 0; i < neighbours.length; i++) {
+                if (neighbours[i] != null) {
+                    open.add(neighbours[i]);
+                }
+            }
+        }
+        return start;
     }
 }

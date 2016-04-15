@@ -12,12 +12,21 @@ import java.util.Comparator;
  * @author Adrian
  * @param <T>
  */
-public interface SearchAlgorithm<T>{
+public interface SearchAlgorithm<T> {
+
     String name();
+
     EnumHeursitic getHeursitic();
+
     int getNodeCost(T t);
+
     Comparator<T> getComparator();
+
     int getLimit();
+
     void setLimit(T b, T a);
+
     boolean limitReached(T a);
+
+    T search(T a, T b);
 }
