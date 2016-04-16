@@ -6,6 +6,7 @@ public class Node<T extends Puzzle> {
     private final Node<T> root; //used for path-finding
     private final int DISTANCE_COST; //TOTAL DISTANCE COST TO THIS POINT
     private final EnumDir direction;
+    private final byte numNeighbours = 4;
     private int HEURSITIC_COST; //TOTAL COST OF THIS PUZZLE
     private int FINAL_COST;
 
@@ -77,6 +78,10 @@ public class Node<T extends Puzzle> {
         return direction;
     }
 
+    public byte getNumNeighbours() {
+        return numNeighbours;
+    }
+
     public void setHEURSITIC_COST(int HEURSITIC_COST) {
         this.HEURSITIC_COST = HEURSITIC_COST;
         this.FINAL_COST = this.HEURSITIC_COST + this.DISTANCE_COST;
@@ -108,7 +113,7 @@ public class Node<T extends Puzzle> {
         byte Col = data.getColumns();
         byte Rows = data.getRows();
         @SuppressWarnings("unchecked")
-        Node<T>[] neighbours = new Node[4];
+        Node<T>[] neighbours = new Node[this.numNeighbours];
 
         //UP DIRECTION
         if (!(index < Col)) {
@@ -140,6 +145,27 @@ public class Node<T extends Puzzle> {
         }
 
         return neighbours;
+    }
+
+    public Node<T> genNeighbour(int i) {
+        byte index = data.getIndex((byte) 0);
+        byte Col = data.getColumns();
+        byte Rows = data.getRows();
+        Node<T> temp = null;
+        if (i == EnumDir.UP.getValue() && (!(index < Col))) {
+            temp = new Node<T>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.UP);
+            temp.getData().swap(index, (byte) (index - 3));
+        } else if (i == EnumDir.LEFT.getValue()) {
+            temp = new Node<>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.LEFT);
+            temp.getData().swap(index, (byte) (index - 1));
+        } else if (i == EnumDir.DOWN.getValue()) {
+            temp = new Node<>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.DOWN);
+            temp.getData().swap(index, (byte) (index + 3));
+        } else if (i == EnumDir.RIGHT.getValue()) {
+            temp = new Node<>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.RIGHT);
+            temp.getData().swap(index, (byte) (index + 1));
+        }
+        return temp;
     }
 
     public boolean isGoal(T end) {

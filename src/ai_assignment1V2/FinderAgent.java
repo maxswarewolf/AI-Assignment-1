@@ -84,13 +84,7 @@ public class FinderAgent<T extends Puzzle> {
 
     //PUBLIC FUNCTION REQUIRED FOR SEARCH
     //Search Algorithms using a priority Queue and a heursitic function
-    public LinkedList<Node<T>> search(SearchAlgorithm<Node<T>> algo, EnumHeursitic heu) {
-//        /**
-//         * Sets the limit of the number of nodes that the algorithm may use
-//         * when checking its logic.
-//         */
-//        algo.setLimit(start, new Node<>(end));
-
+    public LinkedList<Node<T>> search(SearchAlgorithm<Node<T>> algo) {
         /**
          * HashMap is use for the closed list, It holds states that have been
          * visited PriorityQueue is used for the open list, It hold all states
@@ -107,10 +101,11 @@ public class FinderAgent<T extends Puzzle> {
         Node<T> origin = start;
 
         /**
-         * Set the HEURSITIC_COST for the initial node, and then adds the node
-         * to the open list.
+         * Set the HEURSITIC_COST for the initial node, and set the limit for
+         * the algorithm, and then adds the node to the open list.
          */
-        start.setHEURSITIC_COST(heu.value(start.getData(), end));
+        algo.setLimit(MAX_NODES);
+        start.setHEURSITIC_COST(algo.getHeursitic().value(start.getData(), end));
         open.add(start);
 
         /**
@@ -165,7 +160,7 @@ public class FinderAgent<T extends Puzzle> {
              */
             for (int index = 0; index < neighbours.length; index++) {
                 if (neighbours[index] != null) {
-                    neighbours[index].setHEURSITIC_COST(heu.value(neighbours[index].getData(), end));
+                    neighbours[index].setHEURSITIC_COST(algo.getHeursitic().value(neighbours[index].getData(), end));
                     open.add(neighbours[index]);
                     NumGeneratedNodes++;
                 }
@@ -180,7 +175,7 @@ public class FinderAgent<T extends Puzzle> {
             algo.setLimit(origin, new Node<>(end));
             closed.clear();
             open.clear();
-            return search(algo, heu);
+            return search(algo);
         }
 
         /**

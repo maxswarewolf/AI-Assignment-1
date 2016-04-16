@@ -16,6 +16,7 @@ public final class IDAStar implements SearchAlgorithm<Node<PuzzleState>> {
     private final EnumHeursitic hue;
     private int limit = 0;
     private final boolean HAS_DEPTH = true;
+    private Node<PuzzleState> current;
 
     IDAStar(EnumHeursitic hue) {
         this.hue = hue;
@@ -24,23 +25,11 @@ public final class IDAStar implements SearchAlgorithm<Node<PuzzleState>> {
     @Override
     public Comparator<Node<PuzzleState>> getComparator() {
         return (Node<PuzzleState> node1, Node<PuzzleState> node2) -> {
-            if (node1.getFINAL_COST() == node2.getFINAL_COST()) {
-                if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
-                    return 1;
-                }
-                if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
-                    return -1;
-                }
-                return 0;
-            } else {
-                if (node1.getFINAL_COST() > node2.getFINAL_COST()) {
-                    return 1;
-                }
-                if (node1.getFINAL_COST() < node2.getFINAL_COST()) {
-                    return -1;
-                }
-                return 0;
-            }
+            return (node1.getFINAL_COST() == node2.getFINAL_COST())
+                    ? (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) ? 1
+                            : (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) ? -1 : 0
+                    : (node1.getFINAL_COST() > node2.getFINAL_COST()) ? 1
+                            : (node1.getFINAL_COST() < node2.getFINAL_COST()) ? -1 : 0;
         };
     }
 
@@ -78,9 +67,36 @@ public final class IDAStar implements SearchAlgorithm<Node<PuzzleState>> {
         return (this.HAS_DEPTH && (a.getFINAL_COST() > getLimit()));
     }
 
+    private boolean DLS(Node<PuzzleState> origin, Node<PuzzleState> goal, int threshold) {
+        origin.setHEURSITIC_COST(hue.value(origin.getData(), goal.getData()));
+        if (origin.getHEURSITIC_COST() == 0) {
+            this.current = new Node<>(origin);
+            return true;
+        }
+        if (origin.getFINAL_COST() > threshold) {
+            return false;
+        }
+        for (byte i = 0; i < origin.getNumNeighbours(); i++) {
+            Node<PuzzleState> temp = origin.genNeighbour(i);
+            boolean done = (temp != null) ? DLS(temp, goal, threshold) : false;
+            if (done) {
+                this.current = new Node<>(origin);
+                return done;
+            }
+        }
+        return false;
+    }
+
     @Override
-    public Node<PuzzleState> search(Node<PuzzleState> a, Node<PuzzleState> b) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
+        this.current = new Node<>(start);
+        boolean done = true;
+        int threshold = hue.value(start.getData(), end.getData());
+        while (!done) {
+            done = DLS(start, end, threshold);
+            threshold++;
+        }
+        return current;
     }
 
     @Override

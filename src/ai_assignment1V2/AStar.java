@@ -29,23 +29,11 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
     @Override
     public Comparator<Node<PuzzleState>> getComparator() {
         return (Node<PuzzleState> node1, Node<PuzzleState> node2) -> {
-            if (node1.getFINAL_COST() == node2.getFINAL_COST()) {
-                if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
-                    return 1;
-                }
-                if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
-                    return -1;
-                }
-                return 0;
-            } else {
-                if (node1.getFINAL_COST() > node2.getFINAL_COST()) {
-                    return 1;
-                }
-                if (node1.getFINAL_COST() < node2.getFINAL_COST()) {
-                    return -1;
-                }
-                return 0;
-            }
+            return (node1.getFINAL_COST() == node2.getFINAL_COST())
+                    ? (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) ? 1
+                            : (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) ? -1 : 0
+                    : (node1.getFINAL_COST() > node2.getFINAL_COST()) ? 1
+                            : (node1.getFINAL_COST() < node2.getFINAL_COST()) ? -1 : 0;
         };
     }
 
@@ -72,6 +60,11 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
     @Override
     public void setLimit(Node<PuzzleState> b, Node<PuzzleState> a) {
         this.limit = hue.value(b.getData(), a.getData());
+    }
+
+    @Override
+    public void setLimit(int a) {
+        this.limit = a;
     }
 
     @Override
