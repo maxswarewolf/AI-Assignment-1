@@ -89,11 +89,6 @@ public class PuzzleState implements Puzzle {
             temp += Byte.toString(DATA[i]) + " ";
         }
         return temp;
-//        String temp = "[";
-//        for(byte x : DATA){
-//            temp += Byte.toString(x) + " ";
-//        }
-//        return temp + "]";
     }
 
     /**

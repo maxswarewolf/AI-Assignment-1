@@ -14,6 +14,9 @@ import java.util.Comparator;
  */
 public interface SearchAlgorithm<T> {
 
+    int numExploredStates = 0;
+    int numGeneratedNodes = 0;
+
     String name();
 
     EnumHeursitic getHeursitic();

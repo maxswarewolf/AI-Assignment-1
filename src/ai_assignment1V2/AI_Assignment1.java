@@ -10,7 +10,7 @@ import java.util.LinkedList;
 public class AI_Assignment1 {
 
     public static final byte[] G1 = {0, 1, 2, 3, 4, 5, 6, 7, 8}; //{0,1,2,3,4,5,6,7,8}
-    public static final byte[] P1 = {1, 4, 2, 3, 0, 5, 6, 7, 8}; //{6,4,7,8,5,0,3,2,1} {1,4,2,3,0,5,6,7,8} {3,1,2,6,8,4,7,0,5}
+    public static final byte[] P1 = {6, 4, 7, 8, 5, 0, 3, 2, 1}; //{6,4,7,8,5,0,3,2,1} {1,4,2,3,0,5,6,7,8} {3,1,2,6,8,4,7,0,5}
 
     public static void main(String[] args) {
         PuzzleState goal = new PuzzleState(G1, (byte) 3, (byte) 3);
@@ -19,9 +19,9 @@ public class AI_Assignment1 {
         LinkedList<FinderAgent<PuzzleState>> testPuzzles = gen.generatePuzzles(9, 1, goal, start);
         LinkedList<SearchAlgorithm<Node<PuzzleState>>> searchToDo = new LinkedList<>();
         searchToDo.add(new BFS(EnumHeursitic.Uninformed));
-        searchToDo.add(new DFS(EnumHeursitic.Uninformed));
+//        searchToDo.add(new DFS(EnumHeursitic.Uninformed));
 
-//        searchToDo.add(new AStar(EnumHeursitic.MissplacedTiles));
+        searchToDo.add(new AStar(EnumHeursitic.MissplacedTiles));
 //        searchToDo.add(new AStar(EnumHeursitic.ManhattanDistance));
 //        searchToDo.add(new AStar(EnumHeursitic.MissplacedManhattanCombo));
 //        searchToDo.add(new AStar(EnumHeursitic.EuclideanDistance));

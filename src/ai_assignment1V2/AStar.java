@@ -76,8 +76,8 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
-        start.setHEURSITIC_COST(hue.value(start.getData(), end.getData()));
+    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> goal) {
+        start.setHEURSITIC_COST(hue.value(start.getData(), goal.getData()));
         open.add(start);
         while (!open.isEmpty()) {
             Node<PuzzleState> origin = open.poll();
@@ -86,14 +86,14 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
             }
             closed.add(origin.hashCode() + origin.getFINAL_COST());
 
-            if (origin.isGoal(end)) {
-                System.out.println(origin.isGoal(end) + " " + ((origin.getHEURSITIC_COST() == 0) ? "TRUE" : "FALSE"));
+            if (origin.isGoal(goal)) {
                 return origin;
             }
 
             for (byte i = 0; i < origin.getNumNeighbours(); i++) {
                 Node<PuzzleState> neighbour = origin.genNeighbour(i);
                 if (neighbour != null) {
+                    neighbour.setHEURSITIC_COST(hue.value(origin.getData(), goal.getData()));
                     open.add(neighbour);
                 }
             }

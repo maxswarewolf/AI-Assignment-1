@@ -84,7 +84,7 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
                 return origin;
             }
 
-            for (byte i = origin.getNumNeighbours(); i > 0; i++) {
+            for (int i = origin.getNumNeighbours(); i > 0; i--) {
                 Node<PuzzleState> neighbour = origin.genNeighbour(i - 1);
                 if (neighbour != null) {
                     open.push(neighbour);
