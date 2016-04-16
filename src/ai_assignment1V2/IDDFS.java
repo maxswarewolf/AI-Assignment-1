@@ -14,6 +14,7 @@ public final class IDDFS implements SearchAlgorithm<Node<PuzzleState>> {
 
     private final EnumHeursitic hue;
     private int limit = 0;
+    private Node<PuzzleState> current;
 
     public IDDFS(EnumHeursitic hue) {
         this.hue = hue;
@@ -37,23 +38,11 @@ public final class IDDFS implements SearchAlgorithm<Node<PuzzleState>> {
     @Override
     public Comparator<Node<PuzzleState>> getComparator() {
         return (Node<PuzzleState> node1, Node<PuzzleState> node2) -> {
-            if (node1.getDISTANCE_COST() == node2.getDISTANCE_COST()) {
-                if (node1.getDirection().getValue() > node2.getDirection().getValue()) {
-                    return 1;
-                }
-                if (node1.getDirection().getValue() < node2.getDirection().getValue()) {
-                    return -1;
-                }
-                return 0;
-            } else {
-                if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
-                    return -1;
-                }
-                if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
-                    return 1;
-                }
-                return 0;
-            }
+            return (node1.getDISTANCE_COST() == node2.getDISTANCE_COST())
+                    ? (node1.getDirection().getValue() > node2.getDirection().getValue()) ? 1
+                            : (node1.getDirection().getValue() < node2.getDirection().getValue()) ? -1 : 0
+                    : (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) ? -1
+                            : (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) ? 1 : 0;
         };
     }
 
@@ -63,9 +52,9 @@ public final class IDDFS implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public void setLimit(Node<PuzzleState> current, Node<PuzzleState> end) {
+    public void setLimit(Node<PuzzleState> origin, Node<PuzzleState> goal) {
         int previous = this.limit;
-        this.limit = hue.value(current.getData(), end.getData());
+        this.limit = hue.value(origin.getData(), goal.getData());
         while (this.limit <= previous) {
             this.limit++;
         }
@@ -81,33 +70,31 @@ public final class IDDFS implements SearchAlgorithm<Node<PuzzleState>> {
         return (a.getDISTANCE_COST() >= this.limit);
     }
 
-    private Node<PuzzleState> DLS(Node<PuzzleState> origin, Node<PuzzleState> goal, int depth) {
-        if ((depth <= 0) && (origin.isGoal(goal.getData()))) {
-            return origin;
+    private boolean DLS(Node<PuzzleState> origin, Node<PuzzleState> goal, int depth) {
+        if ((depth <= 0) && (origin.isGoal(goal))) {
+            this.current = new Node<>(origin);
+            return true;
         }
         if (depth > 0) {
-            Node<PuzzleState> neighbours[] = origin.genNeighbours();
-            for (byte index = 0; index < neighbours.length; index++) {
-                if (neighbours[index] != null) {
-                    Node<PuzzleState> found = DLS(neighbours[index], goal, depth - 1);
-                    if (found != null) {
-                        return found;
-                    }
+            for (byte index = 0; index < origin.getNumNeighbours(); index++) {
+                Node<PuzzleState> neighbour = origin.genNeighbour(index);
+                if ((neighbour != null) ? DLS(neighbour, goal, depth - 1) : false) {
+                    return true;
                 }
             }
         }
-        return null;
+        return false;
     }
 
     @Override
     public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
-        for (int depth = 0; depth < this.limit; depth++) {
-            Node<PuzzleState> found = DLS(start, end, depth);
-            if (found != null) {
-                return found;
+        boolean done = true;
+        for (int depth = 0; depth < EnumHeursitic.factorial(start.getData().getData().length); depth++) {
+            if (DLS(start, end, depth)) {
+                break;
             }
         }
-        return start;
+        return (done) ? this.current : start;
     }
 
 }

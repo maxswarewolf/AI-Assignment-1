@@ -30,33 +30,28 @@ public class FinderAgent<T extends Puzzle> {
         return finalPath;
     }
 
-    private long factorial(long number) {
-        if (number <= 1) {
-            return 1;
-        } else {
-            return number * factorial(number - 1);
-        }
-    }
-
     //CONSTRUCTOR
+    @SuppressWarnings("unchecked")
     public FinderAgent(T start, T end) {
-        this.start = new Node(start, null, 0, EnumDir.ROOT);
+        this.start = new Node<>(start, null, 0, EnumDir.ROOT);
         this.end = (T) end.returnDeepCopy();
-        this.MAX_NODES = (int) factorial(this.start.getData().getColumns() * this.start.getData().getRows());
+        this.MAX_NODES = (int) EnumHeursitic.factorial(start.getColumns() * start.getRows());
     }
 
     //COPY CONSTRUCTOR
+    @SuppressWarnings("unchecked")
     public FinderAgent(FinderAgent<T> copy) {
-        this.start = new Node(copy.getStart());
+        this.start = new Node<>(copy.getStart());
         this.end = (T) copy.getEnd().returnDeepCopy();
         this.MAX_NODES = copy.getMaxNodes();
     }
 
     //GETTERS
     public Node<T> getStart() {
-        return new Node(start);
+        return new Node<>(start);
     }
 
+    @SuppressWarnings("unchecked")
     public T getEnd() {
         return (T) end.returnDeepCopy();
     }
@@ -104,7 +99,8 @@ public class FinderAgent<T extends Puzzle> {
          * Set the HEURSITIC_COST for the initial node, and set the limit for
          * the algorithm, and then adds the node to the open list.
          */
-        algo.setLimit(MAX_NODES);
+        algo.setLimit(start, new Node<>(end));
+        algo.setLimit((algo.getHeursitic() == EnumHeursitic.Uninformed) ? this.MAX_NODES : algo.getLimit());
         start.setHEURSITIC_COST(algo.getHeursitic().value(start.getData(), end));
         open.add(start);
 
@@ -142,26 +138,21 @@ public class FinderAgent<T extends Puzzle> {
              * will calculate the explored states and return the path to the
              * goal.
              */
-            if (origin.isGoal(end)) { //early exit once path found
+            if (origin.isGoal(new Node<>(end))) { //early exit once path found
                 NumExploredStates = closed.size();
                 return constructPath(origin);
             }
-
-            /**
-             * Will generate the neighbouring nodes, This can either be a node
-             * of null.
-             */
-            Node<T> neighbours[] = origin.genNeighbours();
 
             /**
              * Will loop through the neighbours, and if it isn't null, it will
              * calculate its heursitic add the node to the open list, and then
              * increment the number of nodes generated.
              */
-            for (int index = 0; index < neighbours.length; index++) {
-                if (neighbours[index] != null) {
-                    neighbours[index].setHEURSITIC_COST(algo.getHeursitic().value(neighbours[index].getData(), end));
-                    open.add(neighbours[index]);
+            for (int index = 0; index < origin.getNumNeighbours(); index++) {
+                Node<T> neighbour = origin.genNeighbour(index);
+                if (neighbour != null) {
+                    neighbour.setHEURSITIC_COST(algo.getHeursitic().value(neighbour.getData(), end));
+                    open.add(neighbour);
                     NumGeneratedNodes++;
                 }
             }
@@ -182,6 +173,11 @@ public class FinderAgent<T extends Puzzle> {
          * Will return the root node as a path if no path could be found.
          */
         return constructPath(start);
+    }
+
+    public LinkedList<Node<T>> algoSearch(SearchAlgorithm<Node<T>> algo) {
+        Node<T> temp = algo.search(start, new Node<>(end));
+        return (temp != null) ? constructPath(temp) : constructPath(start);
     }
     //CUSTOM SEARCHING ALGORHYTHIMS
 

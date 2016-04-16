@@ -6,9 +6,7 @@
 package ai_assignment1V2;
 
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.HashSet;
 
 /**
  *
@@ -19,8 +17,7 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
     private final EnumHeursitic hue;
     private int limit = 0;
     private final boolean HAS_DEPTH = false;
-    private final Stack<Node<PuzzleState>> open = new Stack<>();
-    private final Map<Integer, Node<PuzzleState>> closed = new HashMap<>();
+    private final HashSet<Integer> closed = new HashSet<>();
 
     DFS(EnumHeursitic hue) {
         this.hue = hue;
@@ -29,23 +26,11 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
     @Override
     public Comparator<Node<PuzzleState>> getComparator() {
         return (Node<PuzzleState> node1, Node<PuzzleState> node2) -> {
-            if (node1.getDISTANCE_COST() == node2.getDISTANCE_COST()) {
-                if (node1.getDirection().getValue() > node2.getDirection().getValue()) {
-                    return 1;
-                }
-                if (node1.getDirection().getValue() < node2.getDirection().getValue()) {
-                    return -1;
-                }
-                return 0;
-            } else {
-                if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
-                    return -1;
-                }
-                if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
-                    return 1;
-                }
-                return 0;
-            }
+            return (node1.getDISTANCE_COST() == node2.getDISTANCE_COST())
+                    ? (node1.getDirection().getValue() > node2.getDirection().getValue()) ? 1
+                            : (node1.getDirection().getValue() < node2.getDirection().getValue()) ? -1 : 0
+                    : (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) ? -1
+                            : (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) ? 1 : 0;
         };
     }
 
@@ -70,8 +55,12 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public void setLimit(Node<PuzzleState> b, Node<PuzzleState> a) {
-        this.limit = hue.value(b.getData(), a.getData());
+    public void setLimit(Node<PuzzleState> origin, Node<PuzzleState> goal) {
+        int previous = this.limit;
+        this.limit = hue.value(origin.getData(), goal.getData());
+        while (this.limit <= previous) {
+            this.limit++;
+        }
     }
 
     @Override
@@ -81,11 +70,14 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
 
     @Override
     public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
-        closed.put(start.hashCode(), start);
-        Node<PuzzleState> neighbours[] = start.genNeighbours();
-        for (byte i = 0; i < neighbours.length; i++) {
-            if (closed.containsKey(neighbours[i].hashCode())) {
-                return search(neighbours[i], end);
+        closed.add(start.hashCode());
+        if (start.getData().hashCode() == end.getData().hashCode()) {
+            return start;
+        }
+        for (byte i = 0; i < start.getNumNeighbours(); i++) {
+            Node<PuzzleState> neighbour = start.genNeighbour(i);
+            if (closed.contains(neighbour.hashCode())) {
+                return search(neighbour, end);
             }
         }
         return start;

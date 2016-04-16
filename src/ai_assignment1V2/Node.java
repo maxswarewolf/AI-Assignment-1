@@ -168,7 +168,8 @@ public class Node<T extends Puzzle> {
         return temp;
     }
 
-    public boolean isGoal(T end) {
-        return data.equals(end);
+    public boolean isGoal(Node<T> end) {
+        return (data.hashCode() == end.getData().hashCode());
+        //return data.equals(end);
     }
 }

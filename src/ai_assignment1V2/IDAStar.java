@@ -54,9 +54,9 @@ public final class IDAStar implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public void setLimit(Node<PuzzleState> current, Node<PuzzleState> end) {
+    public void setLimit(Node<PuzzleState> origin, Node<PuzzleState> goal) {
         int previous = this.limit;
-        this.limit = hue.value(current.getData(), end.getData());
+        this.limit = hue.value(origin.getData(), goal.getData());
         while (this.limit <= previous) {
             this.limit++;
         }
@@ -69,7 +69,7 @@ public final class IDAStar implements SearchAlgorithm<Node<PuzzleState>> {
 
     private boolean DLS(Node<PuzzleState> origin, Node<PuzzleState> goal, int threshold) {
         origin.setHEURSITIC_COST(hue.value(origin.getData(), goal.getData()));
-        if (origin.getHEURSITIC_COST() == 0) {
+        if (origin.isGoal(goal)) {
             this.current = new Node<>(origin);
             return true;
         }
@@ -77,23 +77,18 @@ public final class IDAStar implements SearchAlgorithm<Node<PuzzleState>> {
             return false;
         }
         for (byte i = 0; i < origin.getNumNeighbours(); i++) {
-            Node<PuzzleState> temp = origin.genNeighbour(i);
-            boolean done = (temp != null) ? DLS(temp, goal, threshold) : false;
-            if (done) {
-                this.current = new Node<>(origin);
-                return done;
+            Node<PuzzleState> neighbour = origin.genNeighbour(i);
+            if ((neighbour != null) ? DLS(neighbour, goal, threshold) : false) {
+                return true;
             }
         }
         return false;
     }
 
     @Override
-    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
-        this.current = new Node<>(start);
-        boolean done = true;
-        int threshold = hue.value(start.getData(), end.getData());
-        while (!done) {
-            done = DLS(start, end, threshold);
+    public Node<PuzzleState> search(Node<PuzzleState> origin, Node<PuzzleState> goal) {
+        int threshold = hue.value(origin.getData(), goal.getData());
+        while (!DLS(origin, goal, threshold)) {
             threshold++;
         }
         return current;

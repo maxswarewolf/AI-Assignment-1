@@ -6,8 +6,7 @@
 package ai_assignment1V2;
 
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 
 /**
@@ -19,7 +18,7 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
     private int limit = 0;
     private final boolean HAS_DEPTH = false;
     private final PriorityQueue<Node<PuzzleState>> open;
-    private final Map<Integer, Node<PuzzleState>> closed = new HashMap<>();
+    private final HashSet<Integer> closed = new HashSet<>();
 
     AStar(EnumHeursitic hue) {
         this.hue = hue;
@@ -58,8 +57,12 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public void setLimit(Node<PuzzleState> b, Node<PuzzleState> a) {
-        this.limit = hue.value(b.getData(), a.getData());
+    public void setLimit(Node<PuzzleState> origin, Node<PuzzleState> goal) {
+        int previous = this.limit;
+        this.limit = hue.value(origin.getData(), goal.getData());
+        while (this.limit <= previous) {
+            this.limit++;
+        }
     }
 
     @Override
@@ -78,19 +81,20 @@ public final class AStar implements SearchAlgorithm<Node<PuzzleState>> {
         open.add(start);
         while (!open.isEmpty()) {
             Node<PuzzleState> origin = open.poll();
-            if (closed.containsKey(origin.hashCode() + origin.getFINAL_COST())) {
+            if (closed.contains(origin.hashCode() + origin.getFINAL_COST())) {
                 continue;
             }
-            closed.put(origin.hashCode() + origin.getFINAL_COST(), origin);
+            closed.add(origin.hashCode() + origin.getFINAL_COST());
 
-            if (origin.isGoal(end.getData())) {
+            if (origin.isGoal(end)) {
+                System.out.println(origin.isGoal(end) + " " + ((origin.getHEURSITIC_COST() == 0) ? "TRUE" : "FALSE"));
                 return origin;
             }
 
-            Node<PuzzleState> neighbours[] = origin.genNeighbours();
-            for (byte i = 0; i < neighbours.length; i++) {
-                if (neighbours[i] != null) {
-                    open.add(neighbours[i]);
+            for (byte i = 0; i < origin.getNumNeighbours(); i++) {
+                Node<PuzzleState> neighbour = origin.genNeighbour(i);
+                if (neighbour != null) {
+                    open.add(neighbour);
                 }
             }
         }

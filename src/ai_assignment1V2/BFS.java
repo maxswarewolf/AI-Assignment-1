@@ -6,9 +6,8 @@
 package ai_assignment1V2;
 
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 
 /**
@@ -21,7 +20,7 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
     private int limit = 0;
     private final boolean HAS_DEPTH = false;
     private final Queue<Node<PuzzleState>> open = new LinkedList<>();
-    private final Map<Integer, Node<PuzzleState>> closed = new HashMap<>();
+    private final HashSet<Integer> closed = new HashSet<>();
 
     BFS(EnumHeursitic hue) {
         this.hue = hue;
@@ -29,42 +28,15 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
 
     @Override
     public Comparator<Node<PuzzleState>> getComparator() {
-        return new Comparator() {
-            private int compare(Node<PuzzleState> node1, Node<PuzzleState> node2) {
-                if (node1.getDISTANCE_COST() == node2.getDISTANCE_COST()) {
-                    if (node1.getRoot().getDirection().getValue() == node2.getRoot().getDirection().getValue()) {
-                        if (node1.getDirection().getValue() > node2.getDirection().getValue()) {
-                            return 1;
-                        }
-                        if (node1.getDirection().getValue() < node2.getDirection().getValue()) {
-                            return -1;
-                        }
-                        return 0;
-                    } else {
-                        if (node1.getRoot().getDirection().getValue() > node2.getRoot().getDirection().getValue()) {
-                            return 1;
-                        }
-                        if (node1.getRoot().getDirection().getValue() < node2.getRoot().getDirection().getValue()) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-
-                } else {
-                    if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
-                        return 1;
-                    }
-                    if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
-                        return -1;
-                    }
-                    return 0;
-                }
-            }
-
-            @Override
-            public int compare(Object o1, Object o2) {
-                return compare((Node) o1, (Node) o2);
-            }
+        return (Node<PuzzleState> node1, Node<PuzzleState> node2) -> {
+            return (node1.getDISTANCE_COST() == node2.getDISTANCE_COST())
+                    ? (node1.getRoot().getDirection().getValue() == node2.getRoot().getDirection().getValue())
+                            ? (node1.getDirection().getValue() > node2.getDirection().getValue()) ? 1
+                                    : (node1.getDirection().getValue() < node2.getDirection().getValue()) ? -1 : 0
+                            : (node1.getRoot().getDirection().getValue() > node2.getRoot().getDirection().getValue()) ? 1
+                                    : (node1.getRoot().getDirection().getValue() < node2.getRoot().getDirection().getValue()) ? -1 : 0
+                    : (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) ? 1
+                            : (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) ? -1 : 0;
         };
     }
 
@@ -89,8 +61,12 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public void setLimit(Node<PuzzleState> b, Node<PuzzleState> a) {
-        this.limit = hue.value(b.getData(), a.getData());
+    public void setLimit(Node<PuzzleState> origin, Node<PuzzleState> goal) {
+        int previous = this.limit;
+        this.limit = hue.value(origin.getData(), goal.getData());
+        while (this.limit <= previous) {
+            this.limit++;
+        }
     }
 
     @Override
@@ -103,20 +79,19 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
         open.add(start);
         while (!open.isEmpty()) {
             Node<PuzzleState> origin = open.poll();
-            if (closed.containsKey(origin.hashCode())) {
+            if (closed.contains(origin.hashCode())) {
                 continue;
             }
-            closed.put(origin.hashCode(), origin);
+            closed.add(origin.hashCode());
 
-            if (origin.isGoal(end.getData())) {
+            if (origin.isGoal(end)) {
                 return origin;
             }
 
-            Node<PuzzleState> neighbours[] = origin.genNeighbours();
-
-            for (byte i = 0; i < neighbours.length; i++) {
-                if (neighbours[i] != null) {
-                    open.add(neighbours[i]);
+            for (byte i = 0; i < origin.getNumNeighbours(); i++) {
+                Node<PuzzleState> neighbour = origin.genNeighbour(i);
+                if (neighbour != null) {
+                    open.add(neighbour);
                 }
             }
         }
