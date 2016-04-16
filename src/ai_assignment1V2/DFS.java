@@ -19,8 +19,8 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
     private final EnumHeursitic hue;
     private int limit = 0;
     private final boolean HAS_DEPTH = false;
-    private Stack<Node<PuzzleState>> open = new Stack<>();
-    private Map<Integer, Node<PuzzleState>> closed = new HashMap<>();
+    private final Stack<Node<PuzzleState>> open = new Stack<>();
+    private final Map<Integer, Node<PuzzleState>> closed = new HashMap<>();
 
     DFS(EnumHeursitic hue) {
         this.hue = hue;
@@ -28,30 +28,23 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
 
     @Override
     public Comparator<Node<PuzzleState>> getComparator() {
-        return new Comparator() {
-            private int compare(Node node1, Node node2) {
-                if (node1.getDISTANCE_COST() == node2.getDISTANCE_COST()) {
-                    if (node1.getDirection().getValue() > node2.getDirection().getValue()) {
-                        return 1;
-                    }
-                    if (node1.getDirection().getValue() < node2.getDirection().getValue()) {
-                        return -1;
-                    }
-                    return 0;
-                } else {
-                    if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
-                        return -1;
-                    }
-                    if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
-                        return 1;
-                    }
-                    return 0;
+        return (Node<PuzzleState> node1, Node<PuzzleState> node2) -> {
+            if (node1.getDISTANCE_COST() == node2.getDISTANCE_COST()) {
+                if (node1.getDirection().getValue() > node2.getDirection().getValue()) {
+                    return 1;
                 }
-            }
-
-            @Override
-            public int compare(Object o1, Object o2) {
-                return compare((Node) o1, (Node) o2);
+                if (node1.getDirection().getValue() < node2.getDirection().getValue()) {
+                    return -1;
+                }
+                return 0;
+            } else {
+                if (node1.getDISTANCE_COST() > node2.getDISTANCE_COST()) {
+                    return -1;
+                }
+                if (node1.getDISTANCE_COST() < node2.getDISTANCE_COST()) {
+                    return 1;
+                }
+                return 0;
             }
         };
     }
@@ -96,5 +89,10 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
             }
         }
         return start;
+    }
+
+    @Override
+    public void setLimit(int a) {
+        this.limit = a;
     }
 }

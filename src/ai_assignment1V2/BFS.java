@@ -122,4 +122,9 @@ public class BFS implements SearchAlgorithm<Node<PuzzleState>> {
         }
         return start;
     }
+
+    @Override
+    public void setLimit(int a) {
+        this.limit = a;
+    }
 }

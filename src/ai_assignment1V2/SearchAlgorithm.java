@@ -26,6 +26,8 @@ public interface SearchAlgorithm<T> {
 
     void setLimit(T b, T a);
 
+    void setLimit(int a);
+
     boolean limitReached(T a);
 
     T search(T a, T b);
