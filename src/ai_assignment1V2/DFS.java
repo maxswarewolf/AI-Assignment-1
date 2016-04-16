@@ -7,6 +7,7 @@ package ai_assignment1V2;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Stack;
 
 /**
  *
@@ -17,6 +18,7 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
     private final EnumHeursitic hue;
     private int limit = 0;
     private final boolean HAS_DEPTH = false;
+    private final Stack<Node<PuzzleState>> open = new Stack<>();
     private final HashSet<Integer> closed = new HashSet<>();
 
     DFS(EnumHeursitic hue) {
@@ -69,18 +71,40 @@ public class DFS implements SearchAlgorithm<Node<PuzzleState>> {
     }
 
     @Override
-    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
-        closed.add(start.hashCode());
-        if (start.getData().hashCode() == end.getData().hashCode()) {
-            return start;
-        }
-        for (byte i = 0; i < start.getNumNeighbours(); i++) {
-            Node<PuzzleState> neighbour = start.genNeighbour(i);
-            if (closed.contains(neighbour.hashCode())) {
-                return search(neighbour, end);
+    public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> goal) {
+        open.add(start);
+        while (!open.isEmpty()) {
+            Node<PuzzleState> origin = open.pop();
+            if (closed.contains(origin.hashCode())) {
+                continue;
+            }
+            closed.add(origin.hashCode());
+
+            if (origin.isGoal(goal)) {
+                return origin;
+            }
+
+            for (byte i = origin.getNumNeighbours(); i > 0; i++) {
+                Node<PuzzleState> neighbour = origin.genNeighbour(i - 1);
+                if (neighbour != null) {
+                    open.push(neighbour);
+                }
             }
         }
         return start;
+//        closed.add(origin.hashCode());
+//        if (origin.isGoal(goal)) {
+//            return origin;
+//        }
+//        for (byte i = 0; i < origin.getNumNeighbours(); i++) {
+//            Node<PuzzleState> neighbour = origin.genNeighbour(i);
+//            if (neighbour != null) {
+//                if (closed.contains(neighbour.hashCode())) {
+//                    return search(neighbour, goal);
+//                }
+//            }
+//        }
+//        return origin;
     }
 
     @Override

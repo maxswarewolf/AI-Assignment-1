@@ -88,9 +88,10 @@ public final class IDDFS implements SearchAlgorithm<Node<PuzzleState>> {
 
     @Override
     public Node<PuzzleState> search(Node<PuzzleState> start, Node<PuzzleState> end) {
-        boolean done = true;
+        boolean done = false;
         for (int depth = 0; depth < EnumHeursitic.factorial(start.getData().getData().length); depth++) {
-            if (DLS(start, end, depth)) {
+            done = DLS(start, end, depth);
+            if (done) {
                 break;
             }
         }

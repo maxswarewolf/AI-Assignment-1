@@ -2,6 +2,7 @@ package ai_assignment1V2;
 
 public class Node<T extends Puzzle> {
 
+    private final boolean debug = true;
     private final T data; //the puzzle it holds
     private final Node<T> root; //used for path-finding
     private final int DISTANCE_COST; //TOTAL DISTANCE COST TO THIS POINT
@@ -89,8 +90,7 @@ public class Node<T extends Puzzle> {
 
     @Override
     public String toString() {
-        //return this.root.getDirection() + " " + this.getDirection() + " " + this.getDISTANCE_COST();
-        return this.data.toString() + "\n" + this.direction.name() + "\n";
+        return (debug) ? this.direction.name() : this.data.toString() + "\n" + this.direction.name();
     }
 
     @Override
@@ -155,13 +155,13 @@ public class Node<T extends Puzzle> {
         if (i == EnumDir.UP.getValue() && (!(index < Col))) {
             temp = new Node<T>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.UP);
             temp.getData().swap(index, (byte) (index - 3));
-        } else if (i == EnumDir.LEFT.getValue()) {
+        } else if (i == EnumDir.LEFT.getValue() && (!(index % Col == 0))) {
             temp = new Node<>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.LEFT);
             temp.getData().swap(index, (byte) (index - 1));
-        } else if (i == EnumDir.DOWN.getValue()) {
+        } else if (i == EnumDir.DOWN.getValue() && (!(index >= (Col * Rows - Col)))) {
             temp = new Node<>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.DOWN);
             temp.getData().swap(index, (byte) (index + 3));
-        } else if (i == EnumDir.RIGHT.getValue()) {
+        } else if (i == EnumDir.RIGHT.getValue() && (!(index % Col == (Col - 1)))) {
             temp = new Node<>((T) data.returnDeepCopy(), this, this.DISTANCE_COST + 1, EnumDir.RIGHT);
             temp.getData().swap(index, (byte) (index + 1));
         }
