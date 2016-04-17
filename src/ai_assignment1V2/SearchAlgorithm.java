@@ -14,24 +14,21 @@ import java.util.Comparator;
  */
 public interface SearchAlgorithm<T> {
 
-    int numExploredStates = 0;
-    int numGeneratedNodes = 0;
+	String name();
 
-    String name();
+	EnumHeursitic getHeursitic();
 
-    EnumHeursitic getHeursitic();
+	int getNodeCost(T t);
 
-    int getNodeCost(T t);
+	Comparator<T> getComparator();
 
-    Comparator<T> getComparator();
+	int getLimit();
 
-    int getLimit();
+	void setLimit(T b, T a);
 
-    void setLimit(T b, T a);
+	void setLimit(int a);
 
-    void setLimit(int a);
+	boolean limitReached(T a);
 
-    boolean limitReached(T a);
-
-    T search(T a, T b);
+	T search(T a, T b);
 }
