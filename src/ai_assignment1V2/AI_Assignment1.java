@@ -14,7 +14,7 @@ public class AI_Assignment1 {
 	public static final byte[] G15 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 0};
 	public static final byte[] P15 = {1, 2, 3, 5, 11, 6, 4, 13, 9, 8, 0, 12, 7, 10, 14};
 
-	public static void main(String[] args) {
+	public static void initalise() {
 		PuzzleState goal = new PuzzleState(G8, (byte) 3, (byte) 3);
 		PuzzleState start = new PuzzleState(P8, (byte) 3, (byte) 3);
 		PuzzleState goal15 = new PuzzleState(G15, (byte) 3, (byte) 5);
@@ -23,7 +23,7 @@ public class AI_Assignment1 {
 		LinkedList<FinderAgent<PuzzleState>> testPuzzles = gen.generatePuzzles(9, 1, goal, start);
 		LinkedList<SearchAlgorithm<Node<PuzzleState>>> searchToDo = new LinkedList<>();
 		searchToDo.add(new BFS(EnumHeursitic.Uninformed));
-//		searchToDo.add(new DFS(EnumHeursitic.Uninformed));
+		searchToDo.add(new DFS(EnumHeursitic.Uninformed));
 		searchToDo.add(new IDDFS(EnumHeursitic.Uninformed));
 
 		searchToDo.add(new AStar(EnumHeursitic.MissplacedTiles));
@@ -42,20 +42,17 @@ public class AI_Assignment1 {
 		searchToDo.add(new GBFS(EnumHeursitic.EuclideanDistance));
 		searchToDo.add(new IDAStar(EnumHeursitic.EuclideanDistance));
 
-		LinkedList<Node<PuzzleState>> path;
 		for (int i = 0; i < testPuzzles.size(); i++) {
 			//Need to add in timing
 			System.out.println("Generic Version Test - " + i + ": with " + testPuzzles.get(i).getMaxNodes() + " different states. " + testPuzzles.get(i).getStart().grid());
 			System.out.println("");
-			for (SearchAlgorithm<Node<PuzzleState>> Algo : searchToDo) {
-				path = testPuzzles.get(i).algoSearch(Algo);
-				System.out.println(Algo.name() + ", With " + Algo.getHeursitic().name() + " Heursitic: " + testPuzzles.get(i).getNumNodes() + " nodes to solution. ");
-				System.out.println(path);
-				path.clear();
-
-				System.out.println("");
-			}
+			testPuzzles.get(i).listAlgoSearch(searchToDo);
 			System.out.println("");
 		}
+	}
+
+	public static void main(String[] args) {
+		initalise();
+
 	}
 }
