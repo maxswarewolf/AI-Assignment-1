@@ -177,7 +177,9 @@ public class FinderAgent<T extends Puzzle> {
 	}
 
 	public LinkedList<Node<T>> algoSearch(SearchAlgorithm<Node<T>> algo) {
-		Node<T> temp = algo.search(start, new Node<>(end));
+		Node<T> temp = (start.getData().getColumns() == end.getColumns()
+				&& start.getData().getRows() == end.getRows())
+						? algo.search(start, new Node<>(end)) : null;
 		return (temp != null) ? constructPath(temp) : constructPath(start);
 	}
 	//CUSTOM SEARCHING ALGORHYTHIMS

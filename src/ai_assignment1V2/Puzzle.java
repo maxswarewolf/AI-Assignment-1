@@ -11,26 +11,23 @@ package ai_assignment1V2;
  */
 public interface Puzzle {
 
-    byte[] getData();
+	byte[] getData();
 
-    byte getIndex(byte item);
+	byte getIndex(byte item);
 
-    byte getColumns();
+	byte getColumns();
 
-    byte getRows();
+	byte getRows();
 
-    void swap(byte a, byte b);
+	void swap(byte a, byte b);
 
-    void deepCopy(Puzzle copy);
+	void deepCopy(Puzzle copy);
 
-    Puzzle returnDeepCopy();
+	Puzzle returnDeepCopy();
 
-    @Override
-    String toString();
+	@Override
+	boolean equals(Object obj);
 
-    @Override
-    boolean equals(Object obj);
-
-    @Override
-    int hashCode();
+	@Override
+	int hashCode();
 }
